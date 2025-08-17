@@ -29,7 +29,7 @@ void move_snake(snake_t *snake)
 	if (x == thing_x && y == thing_y)
 		{
 			snake->length++;
-			snake->positions = realloc(snake->positions, sizeof(point_t) * (snake->length + 1));
+			snake->positions = realloc(snake->positions, sizeof(point_t) * snake->length);
 
 			thing_x = floor(rand() % GAME_WIDTH / 10) * 10;
 			thing_y = floor(rand() % GAME_HEIGHT / 10) * 10;
