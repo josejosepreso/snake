@@ -1,41 +1,8 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
-#include <stdlib.h>
-
-#define SCREEN_WIDTH 900
-#define SCREEN_HEIGHT 630
-
-#define GAME_WIDTH 810
-#define GAME_HEIGHT 600
-
-#define SIZE 10
-#define INITIAL_LENGTH 10
-
-enum {
-	LEFT,
-	UP,
-	DOWN,
-	RIGHT
-};
-
-typedef struct {
-	int x;
-	int y;
-} point_t;
-
-typedef struct {
-	point_t *positions;
-	int direction;
-	int length;
-	bool dead;
-} snake_t;
-
-int thing_x;
-int thing_y;
-
-void move(snake_t *);
-
-bool collides(const point_t *, const int);
+#include "game.h"
+#include "snake.h"
+#include "rendering.h"
 
 int main(void)
 {
@@ -103,34 +70,9 @@ int main(void)
 			if (snake.dead)
 				continue;
 
-			move(&snake);
+			move_snake(&snake);
 
-			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-			SDL_RenderClear(renderer);
-
-			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
-
-			SDL_RenderDrawLine(renderer, 0, 0, GAME_WIDTH, 0);
-			SDL_RenderDrawLine(renderer, GAME_WIDTH, 0, GAME_WIDTH, GAME_HEIGHT);
-			SDL_RenderDrawLine(renderer, GAME_WIDTH, GAME_HEIGHT, 0, GAME_HEIGHT);
-			SDL_RenderDrawLine(renderer, 0, GAME_HEIGHT, 0, 0);
-
-			SDL_SetRenderDrawColor(renderer, 0, 0, 255, 0);
-
-			fillRect.x = thing_x;
-			fillRect.y = thing_y;
-
-			SDL_RenderFillRect(renderer, &fillRect);
-
-			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
-
-			for (int i = 0; i < snake.length; ++i)
-				{
-					fillRect.x = snake.positions[i].x;
-					fillRect.y = snake.positions[i].y;
-
-					SDL_RenderFillRect(renderer, &fillRect);
-				}
+			render_game(&snake, renderer, &fillRect);
 
 			SDL_RenderPresent(renderer);
 			SDL_Delay(32);
@@ -139,63 +81,4 @@ int main(void)
 	free(snake.positions);
 
 	return 0;
-}
-
-void move(snake_t *snake)
-{
-	int x = snake->positions[0].x, y = snake->positions[0].y, nx, ny;
-
-	if (x % GAME_WIDTH == 0
-			|| y % GAME_HEIGHT == 0
-			|| collides(snake->positions, snake->length))
-		{
-			snake->dead = true;
-			return;
-		}
-
-	if (x == thing_x && y == thing_y)
-		{
-			snake->length++;
-			snake->positions = realloc(snake->positions, sizeof(point_t) * (snake->length + 1));
-
-			thing_x = floor(rand() % GAME_WIDTH / 10) * 10;
-			thing_y = floor(rand() % GAME_HEIGHT / 10) * 10;
-		}
-
-	switch (snake->direction)
-		{
-		case UP:
-			snake->positions[0].y -= SIZE;
-			break;
-		case DOWN:
-			snake->positions[0].y += SIZE;
-			break;
-		case LEFT:
-			snake->positions[0].x -= SIZE;
-			break;
-		case RIGHT:
-			snake->positions[0].x += SIZE;
-			break;
-		}
-
-	for (int i = 1; i < snake->length; ++i)
-		{
-			nx = snake->positions[i].x;
-			ny = snake->positions[i].y;
-
-			snake->positions[i].x = x;
-			snake->positions[i].y = y;
-
-			x = nx;
-			y = ny;
-		}
-}
-
-bool collides(const point_t *points, const int size) {
-	for (int i = 0; i < size; ++i)
-		for (int j = i + 1; j < size; ++j)
-				if (points[i].x == points[j].x
-						&& points[i].y == points[j].y)
-					return true;
-	return false;
 }
