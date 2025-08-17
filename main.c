@@ -44,11 +44,7 @@ int main(void)
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		return EXIT_FAILURE;
 
-	window = SDL_CreateWindow("snake",
-														SDL_WINDOWPOS_CENTERED,
-														SDL_WINDOWPOS_CENTERED,
-														SCREEN_WIDTH, SCREEN_HEIGHT,
-														SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("snake", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
 	if (!window)
 		return EXIT_FAILURE;
