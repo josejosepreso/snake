@@ -2,7 +2,7 @@
 
 #define SNAKE_H
 
-#include <stdbool.h>
+#include "game.h"
 
 enum {
 	LEFT,
@@ -20,9 +20,8 @@ typedef struct {
 	point_t *positions;
 	int direction;
 	int length;
-	bool dead;
 } snake_t;
 
-void move_snake(snake_t *);
+void move_snake(snake_t *, game_t *);
 
 #endif

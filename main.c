@@ -4,6 +4,8 @@
 #include "snake.h"
 #include "rendering.h"
 
+void init_game(snake_t *, game_t *);
+
 int main(void)
 {
 	SDL_Window *window = NULL;
@@ -20,19 +22,11 @@ int main(void)
 
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-	int initialHPos = SCREEN_WIDTH / 3;
-	int initialVPos = SCREEN_HEIGHT / 3;
+	SDL_Rect fillRect = { 0, 0, SIZE, SIZE };
 
-	SDL_Rect fillRect = { initialHPos, initialVPos, SIZE, SIZE };
-
-	point_t *positions = malloc(sizeof(point_t) * INITIAL_LENGTH);
-	for (int i = 0; i < INITIAL_LENGTH; ++i)
-		positions[i] = (point_t) { INITIAL_LENGTH + initialHPos - (i - 1) * SIZE, initialVPos };
-
-	snake_t snake = { positions, RIGHT, INITIAL_LENGTH, false };
-
-	thing_x = floor(rand() % GAME_WIDTH / 10) * 10;
-	thing_y = floor(rand() % GAME_HEIGHT / 10) * 10;
+	game_t game = { 0 };
+	snake_t snake = { 0 };
+	init_game(&snake, &game);
 
 	bool quit = false;
 	SDL_Event e;
@@ -43,6 +37,12 @@ int main(void)
 				{
 					if (e.type == SDL_QUIT)
 						quit = true;
+
+					if (game.state == DEAD) {
+						if (e.key.keysym.sym == SDLK_SPACE)
+							init_game(&snake, &game);
+						break;
+					}
 
 					switch (e.key.keysym.sym)
 						{
@@ -67,10 +67,7 @@ int main(void)
 						}
 				}
 
-			if (snake.dead)
-				continue;
-
-			move_snake(&snake);
+			move_snake(&snake, &game);
 
 			render_game(&snake, renderer, &fillRect);
 
@@ -81,4 +78,26 @@ int main(void)
 	free(snake.positions);
 
 	return 0;
+}
+
+void init_game(snake_t *snake, game_t *game)
+{
+	free(snake->positions);
+
+	int initialHPos = GAME_WIDTH / 3;
+	int initialVPos = GAME_HEIGHT / 3;
+
+	point_t *positions = malloc(sizeof(point_t) * INITIAL_LENGTH);
+	for (int i = 0; i < INITIAL_LENGTH; ++i)
+		positions[i] = (point_t) { initialHPos - i * SIZE, initialVPos };
+
+	snake->positions = positions;
+	snake->direction = RIGHT;
+	snake->length = INITIAL_LENGTH;
+
+	thing_x = floor(rand() % GAME_WIDTH / 10) * 10;
+	thing_y = floor(rand() % GAME_HEIGHT / 10) * 10;
+
+	game->state = RUNNING;
+	game->score = 0;
 }

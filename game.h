@@ -13,4 +13,14 @@
 extern int thing_x;
 extern int thing_y;
 
+enum {
+	RUNNING,
+	DEAD
+};
+
+typedef struct {
+	int state;
+	int score;
+} game_t;
+
 #endif
